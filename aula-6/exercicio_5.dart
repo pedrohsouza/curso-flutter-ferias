@@ -21,7 +21,7 @@ void main() {
 
   final int? categoria = null;
 
-  final String busca = '';
+  final String busca = 'queijo';
 
   runApp(
     MainApp(
@@ -68,6 +68,10 @@ class MainApp extends StatelessWidget {
     );
   }
 
+  bool ehValida(String receita, String busca) {
+    return busca == '' || receita.toLowerCase().contains(busca.toLowerCase());
+  }
+
   bool resultadoBusca() {
     final List<MapEntry<String, List<String>>> entries = dados.entries.toList();
 
@@ -87,7 +91,8 @@ class MainApp extends StatelessWidget {
 
     return [
       for (int i = 0; i < entries.length; i++)
-        if (categoria == null || categoria == i + 1)
+        if ((categoria == null || categoria == i + 1) &&
+            entries[i].value.any((receita) => ehValida(receita, busca)))
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -104,8 +109,7 @@ class MainApp extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   for (String receita in entries[i].value)
-                    if (busca == '' ||
-                        receita.toLowerCase().contains(busca.toLowerCase()))
+                    if (ehValida(receita, busca))
                       Text(
                         receita,
                         style: const TextStyle(
