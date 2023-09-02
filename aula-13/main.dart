@@ -31,10 +31,10 @@ class TelaAutenticacao extends StatefulWidget {
 }
 
 class _EstadoTelaAutenticacao extends State<TelaAutenticacao> {
-  String _email = '';  // Armazena o e-mail do usuário
-  String _senha = '';  // Armazena a senha do usuário
-  String? _erroEmail;  // Armazena o erro do campo de e-mail do layout
-  String? _erroSenha;  // Armazena o erro do campo de senha do layout
+  String _email = ''; // Armazena o e-mail do usuário
+  String _senha = ''; // Armazena a senha do usuário
+  String? _erroEmail; // Armazena o erro do campo de e-mail do layout
+  String? _erroSenha; // Armazena o erro do campo de senha do layout
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +65,7 @@ class _EstadoTelaAutenticacao extends State<TelaAutenticacao> {
           MaterialButton(
             padding: const EdgeInsets.all(10),
             color: Colors.blue,
-            child: Text('entrar', style: TextStyle(color: Colors.white)),
+            child: Text('Entrar', style: TextStyle(color: Colors.white)),
             onPressed: () async {
               // Fazer validação do campo de e-mail e senha
               // Para o campo de e-mail, ver https://stackoverflow.com/a/50663835/9997212
@@ -77,7 +77,6 @@ class _EstadoTelaAutenticacao extends State<TelaAutenticacao> {
                   email: _email,
                   password: _senha,
                 );
-
               } on FirebaseAuthException catch (e) {
                 // Verifica os erros de validação ao verificar na nuvem
                 String codigo = e.code;
@@ -103,12 +102,25 @@ class _EstadoTelaAutenticacao extends State<TelaAutenticacao> {
               });
             },
           ),
+          SizedBox(height: 5),
+          MaterialButton(
+            padding: const EdgeInsets.all(10),
+            color: Colors.blue,
+            child: Text('Criar conta', style: TextStyle(color: Colors.white)),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TelaCadastro(),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
   }
 }
-
 
 class TelaCadastro extends StatefulWidget {
   const TelaCadastro({super.key});
@@ -118,10 +130,10 @@ class TelaCadastro extends StatefulWidget {
 }
 
 class _EstadoTelaCadastro extends State<TelaCadastro> {
-  String _email = '';  // Armazena o e-mail do usuário
-  String _senha = '';  // Armazena a senha do usuário
-  String? _erroEmail;  // Armazena o erro do campo de e-mail do layout
-  String? _erroSenha;  // Armazena o erro do campo de senha do layout
+  String _email = ''; // Armazena o e-mail do usuário
+  String _senha = ''; // Armazena a senha do usuário
+  String? _erroEmail; // Armazena o erro do campo de e-mail do layout
+  String? _erroSenha; // Armazena o erro do campo de senha do layout
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +164,7 @@ class _EstadoTelaCadastro extends State<TelaCadastro> {
           MaterialButton(
             padding: const EdgeInsets.all(10),
             color: Colors.blue,
-            child: Text('cadastrar', style: TextStyle(color: Colors.white)),
+            child: Text('Cadastrar', style: TextStyle(color: Colors.white)),
             onPressed: () async {
               // Fazer validação do campo de e-mail e senha
               // Para o campo de e-mail, ver https://stackoverflow.com/a/50663835/9997212
@@ -165,6 +177,12 @@ class _EstadoTelaCadastro extends State<TelaCadastro> {
                   password: _senha,
                 );
 
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TelaConsulta(),
+                  ),
+                );
               } on FirebaseAuthException catch (e) {
                 // Verifica os erros de validação ao verificar na nuvem
                 String codigo = e.code;
@@ -184,6 +202,7 @@ class _EstadoTelaCadastro extends State<TelaCadastro> {
                 });
                 return;
               }
+
               setState(() {
                 _erroEmail = null;
                 _erroSenha = null;
@@ -195,7 +214,6 @@ class _EstadoTelaCadastro extends State<TelaCadastro> {
     );
   }
 }
-
 
 class TelaConsulta extends StatelessWidget {
   const TelaConsulta({super.key});
@@ -241,27 +259,26 @@ class TelaProjetos extends StatelessWidget {
           Text('Apenas usuários autenticados podem ver esta tela.'),
           Text(uid),
           StreamBuilder<Map>(
-            stream: FirebaseDatabase
-              .instance
-              .ref()
-              .child('usuarios')
-              .child(uid)
-              .onValue
-              .map((event) => event.snapshot.value as Map),
+            stream: FirebaseDatabase.instance
+                .ref()
+                .child('usuarios')
+                .child(uid)
+                .onValue
+                .map((event) => event.snapshot.value as Map),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Text('Carregando...');
               }
+
               var dados = snapshot.data;
+
               if (dados == null) {
                 return Text('dados não existem');
               }
               return ListTile(
                 leading: Icon(
                   Icons.add,
-                  color: dados['ativo']
-                    ? Colors.green
-                    : Colors.red,
+                  color: dados['ativo'] ? Colors.green : Colors.red,
                 ),
                 title: Text(dados['nome']),
                 subtitle: Text(dados['data-nascimento']),
@@ -273,12 +290,15 @@ class TelaProjetos extends StatelessWidget {
             color: Colors.blue,
             child: Text('inserir dados', style: TextStyle(color: Colors.white)),
             onPressed: () async {
-              await FirebaseDatabase
-                .instance
-                .ref()
-                .child('usuarios')
-                .child(uid)
-                .set({'nome': 'Enzo', 'ativo': true, 'data-nascimento': '29/01'});
+              await FirebaseDatabase.instance
+                  .ref()
+                  .child('usuarios')
+                  .child(uid)
+                  .set({
+                'nome': 'Enzo',
+                'ativo': true,
+                'data-nascimento': '29/01'
+              });
             },
           ),
           MaterialButton(
